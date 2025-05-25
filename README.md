@@ -1,6 +1,6 @@
-# Impact Fashion - AI-Powered Fashion Recommender
+# Shopsmarter - AI-Powered Fashion Recommender
 
-Impact Fashion is an intelligent fashion recommendation system that uses AI to provide personalized clothing suggestions based on user preferences, uploaded images, and text queries.
+Shopsmarter is an intelligent fashion recommendation system that uses AI to provide personalized clothing suggestions based on user preferences, uploaded images, and text queries.
 
 ## Features
 
@@ -45,26 +45,27 @@ Due to size constraints, the large fashion image dataset and generated catalog f
 
 ## Setup Instructions
 
-1.  Clone the repository:
+1.  Create a **new** repository on GitHub named `shopsmarter`.
+2.  Clone the repository:
     ```bash
-    git clone https://github.com/yourusername/impact-fashion.git
-    cd impact-fashion
+    git clone https://github.com/yourusername/shopsmarter.git
+    cd shopsmarter
     ```
+3.  Copy the code from your local project directory into the new `shopsmarter` directory.
+4.  Set up the dataset following the instructions in the [Dataset](#dataset) section above.
 
-2.  Set up the dataset following the instructions in the [Dataset](#dataset) section above.
-
-3.  Create and activate a virtual environment:
+5.  Create and activate a virtual environment:
     ```bash
     python -m venv venv
     source venv/bin/activate  # On Windows: venv\Scripts\activate
     ```
 
-4.  Install dependencies:
+6.  Install dependencies:
     ```bash
     pip install -r requirements.txt
     ```
 
-5.  Run the application:
+7.  Run the application:
     ```bash
     python app.py
     ```
@@ -85,3 +86,11 @@ The application will be available at `http://localhost:5000`
 ## Extending to Other Categories
 
 You can adapt this application for other product categories by replacing the fashion dataset with a dataset for your desired category and ensuring the `generate_fashion_catalog.py` script and `filter_products` function (if used) are compatible with your new data structure.
+
+## License
+
+[Your chosen license]
+
+## Contributing
+
+[Your contribution guidelines] 
