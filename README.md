@@ -86,11 +86,3 @@ The application will be available at `http://localhost:5000`
 ## Extending to Other Categories
 
 You can adapt this application for other product categories by replacing the fashion dataset with a dataset for your desired category and ensuring the `generate_fashion_catalog.py` script and `filter_products` function (if used) are compatible with your new data structure.
-
-## License
-
-[Your chosen license]
-
-## Contributing
-
-[Your contribution guidelines] 
