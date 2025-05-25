@@ -1,30 +1,95 @@
-# AI Visual Product Recommender Backend
+# Impact Fashion - AI-Powered Fashion Recommender
 
-## Category: Electronics (Demo)
+Impact Fashion is an intelligent fashion recommendation system that uses AI to provide personalized clothing suggestions based on user preferences, uploaded images, and text queries.
 
-This backend demonstrates a visual recommendation system for electronics products using object detection (YOLOv8), image embeddings (CLIP), and fast similarity search (FAISS).
+## Features
 
-- **Sample Data:** The product catalog is a small, curated set of electronics items with demo images and randomly generated embeddings for hackathon/demo purposes.
-- **No real user/product data is used.**
+- **Visual Search**: Upload images to find similar fashion items
+- **Text Search**: Search for items using natural language queries
+- **Smart Filtering**: Filter by gender and other attributes
+- **Shopping Cart**: Add items to cart and checkout
+- **AI Assistant**: Interactive chat interface for help and recommendations (Note: Currently provides mock responses without an OpenAI API key)
+- **Accessibility**: Built with accessibility in mind
 
-## How to Run
+## Dataset
 
-1. Install requirements:
-   ```
-   pip install -r requirements.txt
-   ```
-2. Generate the demo catalog:
-   ```
-   python generate_catalog.py
-   ```
-3. Start the backend server:
-   ```
-   uvicorn app:app --reload
-   ```
+Due to size constraints, the large fashion image dataset and generated catalog files are not included in this repository. To run the application, you will need to:
+
+1.  Download the dataset from [Fashion Product Images (Small)](https://www.kaggle.com/datasets/paramaggarwal/fashion-product-images-small) on Kaggle.
+2.  Extract the downloaded archive.
+3.  Inside the extracted files, you should find a `styles.csv` file and an `images` directory containing the image files.
+4.  Create a `dataset` directory at the root of this project.
+5.  Move the `styles.csv` file and the `images` directory into the newly created `dataset` directory.
+6.  Ensure your project structure looks like this:
+    ```
+    your-project-root/
+    ├── app.py
+    ├── ... (other project files)
+    ├── dataset/
+    │   ├── images/  # Contains image files (.jpg)
+    │   └── styles.csv # Contains image metadata
+    └── ... (other project directories/files)
+    ```
+7.  Generate the catalog with image embeddings (this will create `catalog.csv`):
+    ```bash
+    python generate_fashion_catalog.py
+    ```
+
+## Technical Stack
+
+- **Backend**: Python/Flask
+- **Frontend**: HTML, CSS, JavaScript, Bootstrap 5
+- **AI/ML**: CLIP for image embeddings, FAISS for similarity search
+- **Payment**: Stripe integration (using test keys)
+- **Accessibility**: Basic accessibility considerations and potential for further audits (e.g., using browser developer tools, axe-core)
+
+## Setup Instructions
+
+1.  Clone the repository:
+    ```bash
+    git clone https://github.com/yourusername/impact-fashion.git
+    cd impact-fashion
+    ```
+
+2.  Set up the dataset following the instructions in the [Dataset](#dataset) section above.
+
+3.  Create and activate a virtual environment:
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # On Windows: venv\Scripts\activate
+    ```
+
+4.  Install dependencies:
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+5.  Run the application:
+    ```bash
+    python app.py
+    ```
+
+The application will be available at `http://localhost:5000`
 
 ## API Endpoints
-- `POST /analyze/` — Upload an image, get number of detected objects.
-- `POST /recommend/` — Upload the same image and specify `object_index` (0-based) to get top-5 similar electronics products.
 
----
-**You can extend this backend to other categories by updating the catalog and embeddings.** 
+-   `POST /recommend/`: Get product recommendations based on uploaded image or text query.
+-   `POST /upload_image/`: Upload a new image and save its details to `styles.csv` for potential catalog regeneration.
+-   `POST /add_to_cart/`: Add a product to the shopping cart.
+-   `GET /cart`: View the shopping cart.
+-   `POST /remove_from_cart/`: Remove a product from the shopping cart.
+-   `POST /create-payment-intent/`: Create a Stripe payment intent for checkout.
+-   `GET /payment-success`: Redirect page after successful payment.
+-   `POST /chat`: Interact with the AI assistant (currently mock responses).
+
+## Extending to Other Categories
+
+You can adapt this application for other product categories by replacing the fashion dataset with a dataset for your desired category and ensuring the `generate_fashion_catalog.py` script and `filter_products` function (if used) are compatible with your new data structure.
+
+## License
+
+[Your chosen license]
+
+## Contributing
+
+[Your contribution guidelines] 
