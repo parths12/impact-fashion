@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impact Fashion</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar {
+            background-color: #2c3e50;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .navbar-brand {
+            color: white !important;
+            font-weight: bold;
+        }
+        .upload-area {
+            border: 2px dashed #3498db;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            margin: 20px 0;
+            background-color: white;
+            transition: all 0.3s ease;
+        }
+        .upload-area:hover {
+            border-color: #2980b9;
+            background-color: #f8f9fa;
+        }
+        .upload-icon {
+            font-size: 48px;
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+        .recommendation-card {
+            margin: 10px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .recommendation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .similarity-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(52, 152, 219, 0.9);
+            padding: 8px 12px;
+            border-radius: 20px;
+        }
+        .card-img-top {
+            height: 300px;
+            object-fit: cover;
+        }
+        .card-body {
+            padding: 1.5rem;
+        }
+        .card-title {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .price-tag {
+            color: #000000;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        #loading {
+            display: none;
+        }
+        .search-container {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .search-input {
+            border-radius: 20px;
+            padding: 10px 20px;
+            border: 2px solid #e0e0e0;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        .search-input:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+        .filters {
+            margin-top: 15px;
+        }
+        .filter-btn {
+            border-radius: 20px;
+            margin: 5px;
+            padding: 5px 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            transition: all 0.3s ease;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        /* Ensure high contrast for active filter button */
+        .filter-btn.active {
+            background-color: #000000; /* Black background */
+            color: #FFFFFF; /* White text */
+        }
+        /* Improve contrast for secondary buttons in accessibility tools */
+        .btn-secondary {
+            background-color: #6c757d; /* Bootstrap secondary default */
+            color: white !important; /* Ensure text is white for better contrast */
+            border-color: #6c757d;
+        }
+         .btn-secondary:hover {
+            background-color: #5a6268; /* Darker shade on hover */
+            border-color: #545b62;
+        }
+        /* Ensure high contrast for chatbox send button */
+        #chatbox-send {
+            background: #000000; /* Black background */
+            color: #fff; /* White text */
+            border: none;
+            padding: 0 18px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #chatbox-send:hover {
+            background: #2471a3; /* Even darker shade on hover */
+        }
+        .upload-preview {
+            max-width: 100%;
+            max-height: 300px;
+            margin-top: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+        .cart-icon {
+            color: white;
+            font-size: 1.2rem;
+            position: relative;
+        }
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.8rem;
+        }
+        .add-to-cart-btn {
+            /* Ensure high contrast */
+            background-color: #000000 !important; /* Use !important for higher specificity */
+            color: #FFFFFF !important; /* Use !important for higher specificity */
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        .add-to-cart-btn:hover {
+            background-color: #333333 !important; /* Slightly lighter black on hover */
+        }
+        #chatbox-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 350px;
+            max-width: 90vw;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        #chatbox-header {
+            background: #2c3e50;
+            color: #fff;
+            padding: 12px 16px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        #chatbox-messages {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            font-size: 0.98rem;
+        }
+        #chatbox-input-row {
+            display: flex;
+            border-top: 1px solid #eee;
+            background: #fff;
+        }
+        #chatbox-input {
+            flex: 1;
+            border: none;
+            padding: 12px;
+            font-size: 1rem;
+            outline: none;
+        }
+        .user-msg { text-align: right; color: #2c3e50; margin-bottom: 8px; }
+        .bot-msg { text-align: left; color: #3498db; margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-tshirt me-2"></i>
+                Impact Fashion
+            </a>
+            <a href="/cart" class="cart-icon">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count" id="cartCount">0</span>
+            </a>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container py-4">
+            <h1 class="text-center mb-4">Impact Fashion</h1>
+            <div class="row justify-content-center">
+                <div class="col-md-10">
+                    <div class="search-container">
+                        <input type="text" class="search-input" placeholder="Search for styles, colors, or types..." 
+                               aria-label="Search products" role="searchbox">
+                        <div class="filters" role="group" aria-label="Product filters">
+                            <button class="filter-btn active" aria-pressed="true">All</button>
+                            <button class="filter-btn" aria-pressed="false">Men</button>
+                            <button class="filter-btn" aria-pressed="false">Women</button>
+                        </div>
+                    </div>
+
+                    <div class="upload-area" id="dropZone">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <h2>Upload a Fashion Image</h2>
+                        <p class="text-muted">Drag and drop an image here or click to select</p>
+                        <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                        <img id="uploadPreview" class="upload-preview" alt="Preview of uploaded image">
+                    </div>
+
+                    <div id="loading" class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Finding similar items...</p>
+                    </div>
+
+                    <div id="results" class="row mt-4"></div>
+                </div>
+            </div>
+
+            <!-- Accessibility & Audit Tools Section -->
+            <aside class="mb-4" id="accessibility-tools" role="complementary">
+                <h2>Accessibility & Audit Tools</h2>
+                <button id="run-axe" class="btn btn-outline-primary btn-sm mb-2">Run axe-core Accessibility Check</button>
+                <div id="axe-results" style="white-space: pre-wrap; font-size: 0.95em;"></div>
+                <div class="mt-2">
+                    <a href="https://wave.webaim.org/extension/" target="_blank" class="btn btn-secondary btn-sm">WAVE Extension</a>
+                    <a href="https://developer.chrome.com/docs/lighthouse/overview/" target="_blank" class="btn btn-secondary btn-sm">Lighthouse (Chrome DevTools)</a>
+                </div>
+            </aside>
+            <!-- End Accessibility & Audit Tools Section -->
+        </div>
+    </main>
+
+    <aside id="chatbox-container" role="complementary" aria-label="AI Assistant Chat">
+        <div id="chatbox-header">AI Assistant</div>
+        <div id="chatbox-messages"></div>
+        <div id="chatbox-input-row">
+            <input id="chatbox-input" type="text" placeholder="Type your message..." autocomplete="off" aria-label="Chat message input"/>
+            <button id="chatbox-send" aria-label="Send message">Send</button>
+        </div>
+    </aside>
+
+    <footer role="contentinfo">
+        <!-- Add footer content here if needed -->
+    </footer>
+
+    <!-- Image Details Modal -->
+    <div class="modal fade" id="imageDetailsModal" tabindex="-1" aria-labelledby="imageDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="imageDetailsModalLabel">Enter Image Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="imageDetailsForm">
+                        <div class="mb-3">
+                            <label for="brand_name" class="form-label">Brand Name</label>
+                            <input type="text" class="form-control" id="brand_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="type" class="form-label">Type</label>
+                            <input type="text" class="form-control" id="type" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="color" class="form-label">Color</label>
+                            <input type="text" class="form-control" id="color" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="gender" class="form-label">Gender</label>
+                            <select class="form-control" id="gender" required>
+                                <option value="men">Men</option>
+                                <option value="women">Women</option>
+                                <option value="unisex">Unisex</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="usage" class="form-label">Usage</label>
+                            <select class="form-control" id="usage" required>
+                                <option value="Casual">Casual</option>
+                                <option value="Formal">Formal</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.8.2/axe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const loading = document.getElementById('loading');
+        const results = document.getElementById('results');
+        const uploadPreview = document.getElementById('uploadPreview');
+        const searchInput = document.querySelector('.search-input');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const chatboxMessages = document.getElementById('chatbox-messages');
+        const chatboxInput = document.getElementById('chatbox-input');
+        const chatboxSend = document.getElementById('chatbox-send');
+
+        let currentFilter = 'All';
+        let debounceTimer;
+
+        // Handle drag and drop
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#2980b9';
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.style.borderColor = '#3498db';
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#3498db';
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                handleFile(file);
+            }
+        });
+
+        // Handle click to upload
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        });
+
+        // Preview uploaded image
+        function previewImage(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                uploadPreview.src = e.target.result;
+                uploadPreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handleFile(file) {
+            previewImage(file);
+
+            const formData = new FormData();
+            formData.append('image', file);
+
+            loading.style.display = 'block';
+            results.innerHTML = '';
+
+            fetch('/recommend', { // Send to /recommend for immediate recommendation
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                loading.style.display = 'none';
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                displayResults(data.recommendations);
+                // Modal is no longer shown automatically here
+            })
+            .catch(error => {
+                loading.style.display = 'none';
+                alert('Error getting recommendations: ' + error);
+            });
+        }
+
+        function displayResults(recommendations) {
+            results.innerHTML = '';
+            if (recommendations.length === 0) {
+                results.innerHTML = '<div class="col-12 text-center"><p>No recommendations found.</p></div>';
+                return;
+            }
+
+            recommendations.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'col-md-4 mb-4';
+                card.innerHTML = `
+                    <div class="card recommendation-card">
+                        <span class="similarity-badge" aria-label="Match percentage">${Math.round(item.similarity * 100)}% Match</span>
+                        <img src="${item.image_path}" class="card-img-top" alt="${item.name}" loading="lazy">
+                        <div class="card-body">
+                            <div class="card-title-text">${item.name}</div>
+                            <p class="price-tag" aria-label="Price">$${item.price.toFixed(2)}</p>
+                            <button class="add-to-cart-btn w-100" onclick="addToCart('${item.id}')" 
+                                    aria-label="Add ${item.name} to cart" style="background-color: #000000; color: #FFFFFF;">
+                                <i class="fas fa-cart-plus me-2" aria-hidden="true"></i>Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                `;
+                results.appendChild(card);
+            });
+        }
+
+        async function addToCart(productId) {
+            try {
+                console.log('Attempting to add product to cart. Product ID:', productId);
+                const response = await fetch('/add_to_cart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ product_id: productId }),
+                });
+                const data = await response.json();
+                console.log('Server response for add to cart:', data);
+                
+                if (data.error) {
+                    console.error('Error from server adding to cart:', data.error);
+                    alert(data.error);
+                    return;
+                }
+                
+                if (data.message) {
+                    updateCartCount(data.cart.length);
+                    alert('Product added to cart!');
+                }
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                alert('Error adding product to cart');
+            }
+        }
+
+        function updateCartCount(count) {
+            document.getElementById('cartCount').textContent = count;
+        }
+
+        // Initialize cart count
+        fetch('/cart')
+            .then(response => response.json())
+            .then(data => {
+                updateCartCount(data.cart ? data.cart.length : 0);
+            })
+            .catch(error => console.error('Error fetching cart:', error));
+
+        // Filter buttons
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.textContent;
+                performSearch();
+            });
+        });
+
+        // Search functionality with debouncing
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                performSearch();
+            }, 500); // Wait for 500ms after user stops typing
+        });
+
+        function performSearch() {
+            const searchText = searchInput.value.trim();
+            if (!searchText && currentFilter === 'All') {
+                results.innerHTML = '<div class="col-12 text-center"><p>No recommendations found.</p></div>';
+                return;
+            }
+
+            loading.style.display = 'block';
+            results.innerHTML = '';
+
+            const formData = new FormData();
+            formData.append('text_query', searchText);
+            formData.append('filter', currentFilter);
+
+            fetch('/recommend', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                loading.style.display = 'none';
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                displayResults(data.recommendations);
+            })
+            .catch(error => {
+                loading.style.display = 'none';
+                alert('Error: ' + error);
+            });
+        }
+
+        // Initial state
+        results.innerHTML = '<div class="col-12 text-center"><p>No recommendations found.</p></div>';
+
+        function appendMessage(text, sender) {
+            const msg = document.createElement('div');
+            msg.className = sender === 'user' ? 'user-msg' : 'bot-msg';
+            msg.textContent = text;
+            chatboxMessages.appendChild(msg);
+            chatboxMessages.scrollTop = chatboxMessages.scrollHeight;
+        }
+
+        function sendMessage() {
+            const text = chatboxInput.value.trim();
+            if (!text) return;
+            appendMessage(text, 'user');
+            chatboxInput.value = '';
+            fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text })
+            })
+            .then(res => res.json())
+            .then(data => {
+                appendMessage(data.response, 'bot');
+            })
+            .catch(() => {
+                appendMessage('Sorry, there was an error.', 'bot');
+            });
+        }
+        chatboxSend.onclick = sendMessage;
+        chatboxInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // Accessibility: axe-core integration
+        document.getElementById('run-axe').onclick = function() {
+            if (window.axe) {
+                axe.run(document, {}, function(err, results) {
+                    if (err) {
+                        document.getElementById('axe-results').textContent = 'axe-core error: ' + err;
+                        return;
+                    }
+                    if (results.violations.length === 0) {
+                        document.getElementById('axe-results').textContent = 'No accessibility violations found!';
+                    } else {
+                        document.getElementById('axe-results').textContent =
+                            results.violations.length + ' accessibility violation(s) found:\n' +
+                            results.violations.map(v => '- ' + v.help + ' (' + v.id + '\n  ' + v.nodes.map(n => n.target.join(', ')).join('; ')).join('\n\n');
+                    }
+                });
+            } else {
+                document.getElementById('axe-results').textContent = 'axe-core script not loaded.';
+            }
+        };
+    </script>
+</body>
+</html> 

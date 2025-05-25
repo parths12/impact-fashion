@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impact Fashion - Shopping Cart</title>
+    <script src="https://js.stripe.com/v3/"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .cart-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .cart-item img {
+            max-width: 100px;
+            height: auto;
+        }
+        #payment-form {
+            margin-top: 30px;
+        }
+        #payment-element {
+            margin-bottom: 24px;
+        }
+        #payment-message {
+            color: rgb(105, 115, 134);
+            text-align: center;
+            font-size: 16px;
+            line-height: 20px;
+            padding-top: 12px;
+        }
+        #payment-element .Elements {
+            padding: 24px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Shopping Cart</h1>
+        
+        {% if cart %}
+            <div class="row">
+                <div class="col-md-8">
+                    {% for item in cart %}
+                    <div class="cart-item">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <img src="{{ item.image_path }}" alt="{{ item.name }}" class="img-fluid">
+                            </div>
+                            <div class="col-md-6">
+                                <h5>{{ item.name }}</h5>
+                                <p>Price: ${{ "%.2f"|format(item.price) }}</p>
+                                <p>Quantity: {{ item.quantity }}</p>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <button class="btn btn-danger remove-item" data-product-id="{{ item.id }}">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Order Summary</h5>
+                            <p>Total Items: {{ cart|sum(attribute='quantity') }}</p>
+                            <p>Total Amount: ${{ "%.2f"|format(total) }}</p>
+                            
+                            <form id="payment-form">
+                                <div id="payment-element"></div>
+                                <button id="submit" class="btn btn-primary w-100">Pay Now</button>
+                                <div id="payment-message" class="hidden"></div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                Your cart is empty. <a href="/">Continue shopping</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        const stripe = Stripe('{{ stripe_public_key }}');
+        let elements;
+
+        // Initialize Stripe Elements
+        async function initialize() {
+            const response = await fetch("/create-payment-intent", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+            });
+            const { clientSecret } = await response.json();
+
+            elements = stripe.elements({ clientSecret });
+            const paymentElement = elements.create("payment");
+            paymentElement.mount("#payment-element");
+        }
+
+        // Handle form submission
+        document.getElementById("payment-form").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            setLoading(true);
+
+            const { error } = await stripe.confirmPayment({
+                elements,
+                confirmParams: {
+                    return_url: `${window.location.origin}/payment-success`,
+                },
+            });
+
+            if (error.type === "card_error" || error.type === "validation_error") {
+                showMessage(error.message);
+            } else {
+                showMessage("An unexpected error occurred.");
+            }
+
+            setLoading(false);
+        });
+
+        // Handle remove item
+        document.querySelectorAll('.remove-item').forEach(button => {
+            button.addEventListener('click', async (e) => {
+                const productId = e.target.dataset.productId;
+                try {
+                    const response = await fetch('/remove_from_cart', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ product_id: productId }),
+                    });
+                    const data = await response.json();
+                    if (data.message) {
+                        location.reload();
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            });
+        });
+
+        function setLoading(isLoading) {
+            if (isLoading) {
+                document.querySelector("#submit").disabled = true;
+            } else {
+                document.querySelector("#submit").disabled = false;
+            }
+        }
+
+        function showMessage(messageText) {
+            const messageContainer = document.querySelector("#payment-message");
+            messageContainer.classList.remove("hidden");
+            messageContainer.textContent = messageText;
+            setTimeout(function () {
+                messageContainer.classList.add("hidden");
+                messageText.textContent = "";
+            }, 4000);
+        }
+
+        initialize();
+    </script>
+</body>
+</html> 

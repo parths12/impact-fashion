@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+python-multipart
+pandas
+scikit-learn
+torch
+transformers
+Pillow
+ultralytics
+faiss-cpu
+stripe==7.11.0
+Flask-Session==0.5.0 
