@@ -24,8 +24,8 @@ app.config['SESSION_TYPE'] = 'filesystem'
 Session(app)
 
 # Configure Stripe
-stripe.api_key = 'sk_test_51RS3BGH61D2mKDP5bI3BMXd5WrBSMd8jburVcxiYqFUIdghiaOYU4t3xNUY5rXiadGgEwugZPfONNaGMgeH1xx9300MnSK0QZh'  # Replace with your Stripe secret key
-STRIPE_PUBLISHABLE_KEY = 'pk_test_51RS3BGH61D2mKDP5euHpiXXAavxgJfpfcz35UwzJY9UPEp0CbMnPpscyZZBfWYC2l3Q2q7CNwj3HFAuQOLsG050s00rUYWQzdi'  # Replace with your Stripe publishable key
+stripe.api_key = 'STRIPE_KEY'  # Replace with your Stripe secret key
+STRIPE_PUBLISHABLE_KEY = 'stripe_key'  # Replace with your Stripe publishable key
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -177,7 +177,7 @@ def init_cart():
         session['cart'] = []
 
 # Configure OpenAI
-client = openai.OpenAI(api_key= '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')
+client = openai.OpenAI(api_key= 'ENTER_OPENAI_API_KEY')
 
 @app.route('/')
 def home():
